@@ -1,4 +1,4 @@
-from modules import mcp3208
+import mcp3208
 import RPi.GPIO as GPIO
 
 RELAY_CTL = 12
