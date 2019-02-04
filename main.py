@@ -1,7 +1,7 @@
 from modules.mcp3208 import MCP3208
 import RPi.GPIO as GPIO
 
-RELAT_CTL = 18
+RELAY_CTL = 12
 
 def main():
   ADC = MCP3208(11, 10, 9, 8)
@@ -9,11 +9,11 @@ def main():
   while True:
     for ch in range(2):
       value = ADC.adc(ch)
-      if vale < 2048:
+      if value < 2048:
         GPIO.output(RELAY_CTL, GPIO.HIGH)
       else:
         GPIO.output(RELAY_CTL, GPIO.LOW)
-        
+      print("{}:{}".format(ch, value))
+
 if __name__ == '__main__':
   main()
-
