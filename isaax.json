@@ -1,13 +1,11 @@
 {
-  "name": "qrentrance",
-  "version": "",
-  "description": "",
-  "main": "main.py",
-  "author": "",
-  "license": "",
-  "language":"python",
-  "scripts": {
-	"start": "python3 -u camera/main.py"
-  },
-  "dependency": null
+	"name": "QR code ticket gate",
+	"version": "0.1",
+	"description": "",
+	"author": "Higassy",
+	"license": "XSHELL",
+	"language": "",
+	"scripts": {
+		"start": "python3.5 -u camera/main.py"
+	}
 }
