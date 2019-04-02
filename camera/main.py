@@ -1,5 +1,4 @@
 from flask import Flask, render_template, Response
-from processor.simple_streamer import SimpleStreamer as VideoCamera
 from processor.qr_detector import QRDetector as VideoCamera
 
 import time
