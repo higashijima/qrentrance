@@ -1,11 +1,17 @@
 from flask import Flask, render_template, Response
 from processor.qr_detector import QRDetector as VideoCamera
 
+import RPi.GPIO as GPIO
 import time
 import threading
 
 video_camera = VideoCamera(flip=False)
 
+GPIO.setmode(GPIO.BCM)
+
+# Servo motor GPIO 
+SERVO_OUT = 12
+GPIO.setup(SERVO_OUT, GPIO.OUT)
 
 app = Flask(__name__)
 
@@ -14,7 +20,7 @@ def index():
   return render_template('index.html')
 
 def gen(camera):
-  servo = GPIO.PWM(12, 50)
+  servo = GPIO.PWM(SERVO_OUT, 50)
   while True:
     frame = camera.get_frame()
     yield (b'--frame\r\n'
