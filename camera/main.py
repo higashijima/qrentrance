@@ -12,6 +12,7 @@ GPIO.setmode(GPIO.BCM)
 # Servo motor GPIO 
 SERVO_OUT = 12
 GPIO.setup(SERVO_OUT, GPIO.OUT)
+servo = GPIO.PWM(SERVO_OUT, 50)
 
 app = Flask(__name__)
 
@@ -20,7 +21,6 @@ def index():
   return render_template('index.html')
 
 def gen(camera):
-  servo = GPIO.PWM(SERVO_OUT, 50)
   while True:
     frame = camera.get_frame()
     yield (b'--frame\r\n'
