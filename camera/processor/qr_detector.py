@@ -40,7 +40,7 @@ class QRDetector(object):
     return frame
 
   def decode(self, frame):
-    decoded_objs = pyzbar.decode(frame, scan_locations=True)
+    decoded_objs = pyzbar.decode(frame)
     self.data = ""
     for obj in decoded_objs:
       print(datetime.now().strftime('%H:%M:%S.%f'))
