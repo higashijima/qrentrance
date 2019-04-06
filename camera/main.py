@@ -5,6 +5,8 @@ import RPi.GPIO as GPIO
 import time
 import threading
 
+import MCP3208
+
 video_camera = VideoCamera(flip=False)
 
 GPIO.setmode(GPIO.BCM)
@@ -13,6 +15,14 @@ GPIO.setmode(GPIO.BCM)
 SERVO_OUT = 12
 GPIO.setup(SERVO_OUT, GPIO.OUT)
 servo = GPIO.PWM(SERVO_OUT, 50)
+
+# AD convertor
+CS = 8
+CLK = 11
+IN = 9
+OUT = 10
+
+adc = MCP3208(CS, CLK, IN, OUT)
 
 app = Flask(__name__)
 
@@ -26,10 +36,13 @@ def gen(camera):
     yield (b'--frame\r\n'
          b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
 
+    print("getting data:{}".format(camera.data))
     if(camera.data == "qrcode"):
        servo.ChangeDutyCycle(2.5)
+       sleel(0.5)
     else:
        servo.ChangeDutyCycle(7.25)
+       sleel(0.5)
 
 @app.route('/video_feed')
 def video_feed():
