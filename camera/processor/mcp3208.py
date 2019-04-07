@@ -22,7 +22,7 @@ class mcp3208:
     GPIO.setup(miso, GPIO.IN)
     GPIO.setup(cs, GPIO.OUT)
 
-  def adc(self, ch):
+  def getData(self, ch):
     if (ch>7 or ch<0):
       return -1
 

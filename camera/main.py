@@ -1,11 +1,11 @@
 from flask import Flask, render_template, Response
 from processor.qr_detector import QRDetector as VideoCamera
 
+from processor.mcp3208 import mcp3208
+from processor.pds2501 import PDS2501
 import RPi.GPIO as GPIO
 import time
 import threading
-
-import MCP3208
 
 video_camera = VideoCamera(flip=False)
 
@@ -13,8 +13,7 @@ GPIO.setmode(GPIO.BCM)
 
 # Servo motor GPIO 
 SERVO_OUT = 12
-GPIO.setup(SERVO_OUT, GPIO.OUT)
-servo = GPIO.PWM(SERVO_OUT, 50)
+servo = PDS2501(SERVO_OUT)
 
 # AD convertor
 CS = 8
@@ -32,12 +31,19 @@ def index():
 
 def gen(camera):
   while True:
+    # Draw picture
     frame = camera.get_frame()
     yield (b'--frame\r\n'
          b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
 
+    # Entrance sensing
+    entrDIst = adc.getData(0)
+    exitDist = adc.getData(1)
+
+    qrDetect = enterDist
+
     print("getting data:{}".format(camera.data))
-    if(camera.data == "qrcode"):
+    if("{}"format(camera.data) == "qrcode"):
        servo.ChangeDutyCycle(2.5)
        sleel(0.5)
     else:
