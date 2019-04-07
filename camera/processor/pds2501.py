@@ -10,6 +10,7 @@ class PDS2501:
 
   __del__(self):
     self.servo.stop()
+    GPIO.cleanup()
 
   turn(self, duty):
     servo.ChangeDutyCycle(duty)
