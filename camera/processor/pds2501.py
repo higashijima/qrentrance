@@ -3,16 +3,19 @@ import time
 import sys
 
 class PDS2501:
-  __init__(self, dutyPin):
-    GPIO.setup(dutyPin, GPIO.OUT)
-    self.servo = GPIO.RWM(dutyPin, 50)
-    self.servo.start(0)
+  def __init__(self, dutyPin):
+    self.dutyPin = dutyPin
 
-  __del__(self):
-    self.servo.stop()
+  def __del__(self):
     GPIO.cleanup()
 
-  turn(self, duty):
-    servo.ChangeDutyCycle(duty)
+  def turn(self, duty):
+    GPIO.setup(self.dutyPin, GPIO.OUT)
+    self.servo = GPIO.PWM(self.dutyPin, 50)
+    self.servo.start(0)
+    self.servo.ChangeDutyCycle(duty)
+    print("DutyCycle:{}".format(duty))
     time.sleep(0.5)
+    self.servo.stop()
+    GPIO.cleanup(self.dutyPin)
 

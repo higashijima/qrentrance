@@ -9,7 +9,7 @@ CS_OUT = GPIO.HIGH
 CLK_IN = GPIO.LOW
 CLK_OUT = GPIO.HIGH
 
-class mcp3208:
+class MCP3208:
   def __init__(self, clk, mosi, miso, cs):
     self.clk = clk
     self.mosi = mosi

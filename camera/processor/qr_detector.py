@@ -27,13 +27,14 @@ class QRDetector(object):
     return jpeg.tobytes()
     
   def process_image(self, frame):
+    self.detected = False
     decoded_objs = self.decode(frame)
     # 認識したQRコードの位置を描画する
     # frame = self.draw_positions(frame, decoded_objs)
 
     detected = False 
     if len(decoded_objs) > 0:
-      detected = True
+      self.detected = True
 
     cv2.putText(frame, 'Detected: {}'.format(detected), (15, 30), cv2.FONT_HERSHEY_DUPLEX, 0.8, (0, 255, 0), 1)
 

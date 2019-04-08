@@ -1,10 +1,11 @@
 from flask import Flask, render_template, Response
 from processor.qr_detector import QRDetector as VideoCamera
 
-from processor.mcp3208 import mcp3208
+from processor.mcp3208 import MCP3208
 from processor.pds2501 import PDS2501
 import RPi.GPIO as GPIO
 import time
+from datetime import datetime as dt
 import threading
 
 video_camera = VideoCamera(flip=False)
@@ -37,16 +38,17 @@ def gen(camera):
          b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
 
     # Entrance sensing
-    entrDIst = adc.getData(0)
+    enterDist = adc.getData(0)
     exitDist = adc.getData(1)
 
-    qrDetect = enterDist
+    qrDetect = enterDist < 2048
 
-    print("getting data:{}".format(camera.data))
-    if(camera.data == b'qrcode'):
-       print("open")
-    else:
-       print("close")
+    if(qrDetect):
+      enterDt = dt.now()
+      while(not camera.detected and (dt.now()-enterDt).seconds < 3):
+         if(camera.data == b'qrcode'):
+           print("open")
+           servo.turn(2.5)
 
 @app.route('/video_feed')
 def video_feed():
