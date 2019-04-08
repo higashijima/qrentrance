@@ -44,11 +44,9 @@ def gen(camera):
 
     print("getting data:{}".format(camera.data))
     if(camera.data == b'qrcode'):
-       servo.ChangeDutyCycle(2.5)
-       sleel(0.5)
+       print("open")
     else:
-       servo.ChangeDutyCycle(7.25)
-       sleel(0.5)
+       print("close")
 
 @app.route('/video_feed')
 def video_feed():
