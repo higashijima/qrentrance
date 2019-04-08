@@ -43,7 +43,7 @@ def gen(camera):
     qrDetect = enterDist
 
     print("getting data:{}".format(camera.data))
-    if("{}"format(camera.data) == b'qrcode'):
+    if(camera.data == b'qrcode'):
        servo.ChangeDutyCycle(2.5)
        sleel(0.5)
     else:
