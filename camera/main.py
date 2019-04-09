@@ -45,10 +45,13 @@ def gen(camera):
 
     if(qrDetect):
       enterDt = dt.now()
+      # wait for detecting QRcode until 3seconds 
       while(not camera.detected and (dt.now()-enterDt).seconds < 3):
          if(camera.data == b'qrcode'):
            print("open")
            servo.turn(2.5)
+
+      servo.turn(7.25)
 
 @app.route('/video_feed')
 def video_feed():
