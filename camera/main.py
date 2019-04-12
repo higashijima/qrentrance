@@ -22,7 +22,7 @@ CLK = 11
 IN = 9
 OUT = 10
 
-adc = MCP3208(CS, CLK, IN, OUT)
+adc = MCP3208(CLK, OUT, IN, CS)
 
 app = Flask(__name__)
 
