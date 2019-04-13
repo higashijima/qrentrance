@@ -8,7 +8,9 @@ from pyzbar import pyzbar
 
 class QRDetector(object):
   def __init__(self, flip = False):
-    self.vs = PiVideoStream(resolution=(400, 304), framerate=3).start()
+    self.data = b''
+    self.detected = False
+    self.vs = PiVideoStream(resolution=(400, 304), framerate=30).start()
     self.flip = flip
     time.sleep(2.0)
 
@@ -16,33 +18,36 @@ class QRDetector(object):
     self.vs.stop()
 
   def flip_if_needed(self, frame):
+    print("flip_if_needed")
     if self.flip:
       return np.flip(frame, 0)
     return frame
 
   def get_frame(self):
+    print("get_frame")
+    self.data = b''
     frame = self.flip_if_needed(self.vs.read())
     frame = self.process_image(frame)
     ret, jpeg = cv2.imencode('.jpg', frame)
     return jpeg.tobytes()
     
   def process_image(self, frame):
-    self.detected = False
+    print("process_image")
     decoded_objs = self.decode(frame)
     # 認識したQRコードの位置を描画する
     # frame = self.draw_positions(frame, decoded_objs)
 
-    detected = False 
+    self.detected = False 
     if len(decoded_objs) > 0:
       self.detected = True
 
-    cv2.putText(frame, 'Detected: {}'.format(detected), (15, 30), cv2.FONT_HERSHEY_DUPLEX, 0.8, (0, 255, 0), 1)
+    cv2.putText(frame, 'Detected: {}'.format(self.detected), (15, 30), cv2.FONT_HERSHEY_DUPLEX, 0.8, (0, 255, 0), 1)
 
     return frame
 
   def decode(self, frame):
+    print("decode")
     decoded_objs = pyzbar.decode(frame)
-    self.data = ""
     for obj in decoded_objs:
       print(datetime.now().strftime('%H:%M:%S.%f'))
       print('Type: ', obj.type)
@@ -52,6 +57,7 @@ class QRDetector(object):
     return decoded_objs
 
   def draw_positions(self, frame, decoded_objs):
+    print("draw_positions")
     for obj in decoded_objs:
       left, top, width, height = obj.rect
       frame = cv2.rectangle(frame,

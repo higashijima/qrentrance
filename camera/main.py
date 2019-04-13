@@ -30,9 +30,16 @@ app = Flask(__name__)
 def index():
   return render_template('index.html')
 
+def dispWindow(camera):
+  print("dispWindow")
+  frame = camera.get_frame()
+  yield (b'--frame\r\n'
+       b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+
 def gen(camera):
   while True:
     # Draw picture
+    #dispWindow(camera)
     frame = camera.get_frame()
     yield (b'--frame\r\n'
          b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
@@ -41,15 +48,24 @@ def gen(camera):
     enterDist = adc.getData(0)
     exitDist = adc.getData(1)
 
+    print("enterDist={}  exitDist={}  data={}".format(enterDist, exitDist, camera.data))
     qrDetect = enterDist < 2048
 
     if(qrDetect):
+
       enterDt = dt.now()
       # wait for detecting QRcode until 3seconds 
       while(not camera.detected and (dt.now()-enterDt).seconds < 3):
-         if(camera.data == b'qrcode'):
-           print("open")
-           servo.turn(2.5)
+        #dispWindow(camera)
+        print("Enter any person:{}".format(camera.data))
+        frame = camera.get_frame()
+        yield (b'--frame\r\n'
+             b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+        if(camera.data == b'qrcode'):
+          print("open")
+          servo.turn(2.5)
+          time.sleep(1)
+          break
 
       servo.turn(7.25)
 
