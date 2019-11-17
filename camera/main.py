@@ -44,6 +44,7 @@ def gen(camera):
     qrDetect = enterDist < 2048
 
     if(qrDetect):
+      print("enter here")
       enterDt = dt.now()
       # wait for detecting QRcode until 3seconds 
       while(not camera.detected and (dt.now()-enterDt).seconds < 3):
