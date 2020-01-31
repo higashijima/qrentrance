@@ -6,64 +6,74 @@ import cv2
 
 from pyzbar import pyzbar
 
+import os
+from logging import getLogger, basicConfig
+logger = getLogger(__name__)
+
 class QRDetector(object):
-  def __init__(self, flip = False):
-    self.data = b''
-    self.detected = False
-    self.vs = PiVideoStream(resolution=(400, 304), framerate=30).start()
-    self.flip = flip
-    time.sleep(2.0)
+    def __init__(self, flip = False):
+        self.data = b''
+        self.detected = False
+        self.vs = PiVideoStream(resolution=(400, 304), framerate=30).start()
+        self.flip = flip
+        time.sleep(2.0)
 
-  def __del__(self):
-    self.vs.stop()
+    def __del__(self):
+        self.vs.stop()
 
-  def flip_if_needed(self, frame):
-    print("flip_if_needed")
-    if self.flip:
-      return np.flip(frame, 0)
-    return frame
+    def flip_if_needed(self, frame):
+        if self.flip:
+            return np.flip(frame, 0)
+        return frame
 
-  def get_frame(self):
-    print("get_frame")
-    self.data = b''
-    frame = self.flip_if_needed(self.vs.read())
-    frame = self.process_image(frame)
-    ret, jpeg = cv2.imencode('.jpg', frame)
-    return jpeg.tobytes()
+    def get_frame(self):
+        logger.info("begin")
+        self.data = b''
+        frame = self.flip_if_needed(self.vs.read())
+        frame = self.process_image(frame)
+        ret, jpeg = cv2.imencode('.jpg', frame)
+        return jpeg.tobytes()
+        
+    def process_image(self, frame):
+        logger.info("process_image")
+        decoded_objs = self.decode(frame)
+        # 認識したQRコードの位置を描画する
+        frame = self.draw_positions(frame, decoded_objs)
+
+        self.detected = False 
+        if len(decoded_objs) > 0:
+            self.detected = True
+
+        cv2.putText(frame, 'Detected: {}'.format(self.detected), (15, 30), cv2.FONT_HERSHEY_DUPLEX, 0.8, (0, 255, 0), 1)
+
+        return frame
+
+    def decode(self, frame):
+        logger.info("decode")
+        decoded_objs = pyzbar.decode(frame)
+        for obj in decoded_objs:
+            logger.info(datetime.now().strftime('%H:%M:%S.%f'))
+            logger.info('Type: ', obj.type)
+            logger.info('Data: ', obj.data)
+            self.data = obj.data
+
+        return decoded_objs
+
+    def draw_positions(self, frame, decoded_objs):
+        logger.info("draw_positions")
+        for obj in decoded_objs:
+            left, top, width, height = obj.rect
+            frame = cv2.rectangle(frame,
+                                    (left, top),
+                                    (left + width, height + top),
+                                    (0, 255, 0), 2)
+            data = obj.data.decode('utf-8')
+
+        return frame
+
+    def get_data(self):
+        return self.data
+
+if __name__=='__main__':
+    qr = QRDetector(flip = False)
     
-  def process_image(self, frame):
-    print("process_image")
-    decoded_objs = self.decode(frame)
-    # 認識したQRコードの位置を描画する
-    # frame = self.draw_positions(frame, decoded_objs)
-
-    self.detected = False 
-    if len(decoded_objs) > 0:
-      self.detected = True
-
-    cv2.putText(frame, 'Detected: {}'.format(self.detected), (15, 30), cv2.FONT_HERSHEY_DUPLEX, 0.8, (0, 255, 0), 1)
-
-    return frame
-
-  def decode(self, frame):
-    print("decode")
-    decoded_objs = pyzbar.decode(frame)
-    for obj in decoded_objs:
-      print(datetime.now().strftime('%H:%M:%S.%f'))
-      print('Type: ', obj.type)
-      print('Data: ', obj.data)
-      self.data = obj.data
-
-    return decoded_objs
-
-  def draw_positions(self, frame, decoded_objs):
-    print("draw_positions")
-    for obj in decoded_objs:
-      left, top, width, height = obj.rect
-      frame = cv2.rectangle(frame,
-                  (left, top),
-                  (left + width, height + top),
-                  (0, 255, 0), 2)
-      data = obj.data.decode('utf-8')
-
-    return frame
