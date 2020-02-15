@@ -5,7 +5,6 @@ import os
 from logging import getLogger, INFO, DEBUG
 logger = getLogger(__name__)
 
-
 class Motor:
     def __init__(self, leftPin, rightPin):
         logger.debug("left={}, right={}".format(leftPin, rightPin))

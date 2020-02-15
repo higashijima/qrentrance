@@ -7,6 +7,9 @@ import time
 from logging import getLogger
 logger = getLogger(__name__)
 
+spi = spidev.SpiDev()
+spi.open(0,0)
+
 CS_IN = GPIO.LOW
 CS_OUT = GPIO.HIGH
 CLK_IN = GPIO.LOW

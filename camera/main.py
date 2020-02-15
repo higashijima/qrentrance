@@ -25,6 +25,8 @@ LEFT = 27
 RIGHT = 22
 OPEN = True
 CLOSE = False
+opened = CLOSE
+motor = Motor(LEFT, RIGHT)
 
 # AD convertor
 CS = 8
@@ -33,6 +35,7 @@ IN = 9
 OUT = 10
 
 adc = MCP3208(CLK, OUT, IN, CS)
+
 
 app = Flask(__name__)
 
@@ -47,9 +50,20 @@ def dispWindow(camera):
     yield (b'--frame\r\n'
              b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
 
+def openDoor():
+    logger.info("open")
+    if not opened:
+        motor.turn(OPEN)
+
+def closeDoor():
+    logger.info("close")
+    if opened:
+        motor.turn(CLOSE)
+
 def gen(camera):
     logger.info("begin")
     motor = Motor(LEFT, RIGHT)
+
     while True:
         # Draw picture
         #dispWindow(camera)
@@ -62,8 +76,7 @@ def gen(camera):
         exitDist = adc.getData(1)
 
         logger.debug("enterDist={}, exitDist={}, data={}".format(enterDist, exitDist, camera.get_data()))
-#        qrDetect = enterDist < 2048
-        qrDetect = True
+        qrDetect = enterDist < 2048
 
         if(qrDetect):
             logger.debug("enter here")
@@ -77,12 +90,14 @@ def gen(camera):
                 yield (b'--frame\r\n'
                          b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
                 if(camera.get_data() == b'qrcode'):
-                    logger.info("open")
-#                    motor.turn(OPEN)
+                    opened = True
+                    openDoor()
                     time.sleep(1)
                     break
+                else:
+                    closeDoor()
 
-#                motor.turn(CLOSE)
+            closeDoor()     
 
 @app.route('/video_feed')
 def video_feed():
